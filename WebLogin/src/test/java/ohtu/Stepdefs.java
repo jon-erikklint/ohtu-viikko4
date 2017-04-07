@@ -1,5 +1,6 @@
 package ohtu;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -20,6 +21,13 @@ public class Stepdefs {
         driver.get(baseUrl);
         WebElement element = driver.findElement(By.linkText("login"));       
         element.click();          
+    }
+    
+    @Given("^new user is selected$")
+    public void new_user_is_selected() throws Throwable {
+        driver.get(baseUrl);
+        WebElement element = driver.findElement(By.linkText("register new user"));
+        element.click();
     }
     
     @When("^correct username \"([^\"]*)\" and password \"([^\"]*)\" are given$")
@@ -47,7 +55,39 @@ public class Stepdefs {
     public void user_is_not_logged_in_and_error_message_is_given() throws Throwable {
         pageHasContent("invalid username or password");
         pageHasContent("Give your credentials to login");
-    }   
+    }
+
+    @Then("^user is created$")
+    public void user_is_created() throws Throwable {
+        pageHasContent("Welcome to Ohtu Application!");
+    }
+
+    @Then("^user is not created and error \"([^\"]*)\" is reported$")
+    public void user_is_not_created_and_error_is_reported(String report) throws Throwable {
+        pageHasContent("Create username and give password");
+        pageHasContent(report);
+    }
+    
+    @When("^correct username \"([^\"]*)\" and correct password \"([^\"]*)\" are given to register$")
+    public void correct_username_and_correct_password_are_given_to_register(String username, String password) throws Throwable {
+        registerWith(username, password, password);
+    }
+
+    @When("^incorrect username \"([^\"]*)\" and password \"([^\"]*)\" are given to register$")
+    public void incorrect_username_and_password_are_given_to_register(String username, String password) throws Throwable {
+        registerWith(username, password, password);
+    }
+
+    @When("^correct username \"([^\"]*)\" and incorrect password \"([^\"]*)\" are given to register$")
+    public void correct_username_and_incorrect_password_are_given_to_register(String username, String password) throws Throwable {
+        registerWith(username, password, password);
+    }
+
+    @When("^correct username \"([^\"]*)\", correct password \"([^\"]*)\" and incorrect confirmation \"([^\"]*)\" are given to register$")
+    public void correct_username_correct_password_and_incorrect_confirmation_are_given_to_register(String username, String password, String confirmation) throws Throwable {
+        registerWith(username, password, confirmation);
+    }
+
 
     @After
     public void tearDown(){
@@ -57,6 +97,20 @@ public class Stepdefs {
  
     private void pageHasContent(String content) {
         assertTrue(driver.getPageSource().contains(content));
+    }
+    
+    private void registerWith(String username, String password, String passwordConfirmation){
+        assertTrue(driver.getPageSource().contains("Create username and give password"));
+        
+        WebElement element = driver.findElement(By.name("username"));
+        element.sendKeys(username);
+        element = driver.findElement(By.name("password"));
+        element.sendKeys(password);
+        element = driver.findElement(By.name("passwordConfirmation"));
+        element.sendKeys(passwordConfirmation);
+        
+        element = driver.findElement(By.name("signup"));
+        element.submit();
     }
         
     private void logInWith(String username, String password) {
