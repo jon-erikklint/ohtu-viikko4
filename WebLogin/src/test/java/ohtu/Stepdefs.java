@@ -87,6 +87,16 @@ public class Stepdefs {
     public void correct_username_correct_password_and_incorrect_confirmation_are_given_to_register(String username, String password, String confirmation) throws Throwable {
         registerWith(username, password, confirmation);
     }
+    
+    @Given("^user with username \"([^\"]*)\" with password \"([^\"]*)\" is succesfully created$")
+    public void user_with_username_with_password_is_succesfully_created(String username, String password) throws Throwable {
+        tryRegisteringWith(username, password);
+    }
+
+    @Given("^user with username \"([^\"]*)\" and password \"([^\"]*)\" is unsuccesfully created$")
+    public void user_with_username_and_password_is_unsuccesfully_created(String username, String password) throws Throwable {
+        tryRegisteringWith(username, password);
+    }
 
 
     @After
@@ -97,6 +107,11 @@ public class Stepdefs {
  
     private void pageHasContent(String content) {
         assertTrue(driver.getPageSource().contains(content));
+    }
+    
+    private void tryRegisteringWith(String username, String password) throws Throwable{
+        new_user_is_selected();
+        registerWith(username, password, password);
     }
     
     private void registerWith(String username, String password, String passwordConfirmation){
